@@ -191,7 +191,7 @@ class SimpleProgressBar:
         for i in range(self.atIndex, next):
             idx = i % 5
             if idx == 0:
-                sys.stdout.write('%-2d' % (i*2))
+                sys.stdout.write('{0:<2d}'.format((i*2)))
             elif idx == 1:
                 pass # Skip second char
             elif idx < 4:
@@ -247,7 +247,7 @@ class ProgressBar:
         if self.cleared:
             sys.stdout.write(self.header)
             self.cleared = 0
-        prefix = '%3d%% ' % (percent*100,)
+        prefix = '{0:3d}% '.format(percent*100)
         suffix = ''
         if self.useETA:
             elapsed = time.time() - self.startTime
@@ -257,7 +257,7 @@ class ProgressBar:
                 h = eta//3600.
                 m = (eta//60) % 60
                 s = eta % 60
-                suffix = ' ETA: %02d:%02d:%02d'%(h,m,s)
+                suffix = ' ETA: {0:02d}:{1:02d}:{2:02d}'.format(h, m, s)
         barWidth = self.width - len(prefix) - len(suffix) - 2
         n = int(barWidth*percent)
         if len(message) < self.width:

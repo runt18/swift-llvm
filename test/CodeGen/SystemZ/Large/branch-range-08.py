@@ -40,13 +40,13 @@ print 'define void @f1(i8 *%base, i64 *%counts) {'
 print 'entry:'
 
 for i in xrange(branch_blocks - 1, -1, -1):
-    print '  %%countptr%d = getelementptr i64, i64 *%%counts, i64 %d' % (i, i)
-    print '  %%initcount%d = load i64 , i64 *%%countptr%d' % (i, i)
-    print '  br label %%loop%d' % i
+    print '  %countptr{0:d} = getelementptr i64, i64 *%counts, i64 {1:d}'.format(i, i)
+    print '  %initcount{0:d} = load i64 , i64 *%countptr{1:d}'.format(i, i)
+    print '  br label %loop{0:d}'.format(i)
     
-    print 'loop%d:' % i
-    block1 = 'entry' if i == branch_blocks - 1 else 'loop%d' % (i + 1)
-    block2 = 'loop0' if i == 0 else 'after%d' % (i - 1)
+    print 'loop{0:d}:'.format(i)
+    block1 = 'entry' if i == branch_blocks - 1 else 'loop{0:d}'.format((i + 1))
+    block2 = 'loop0' if i == 0 else 'after{0:d}'.format((i - 1))
     print ('  %%count%d = phi i64 [ %%initcount%d, %%%s ],'
            ' [ %%nextcount%d, %%%s ]' % (i, i, block1, i, block2))
 
@@ -55,15 +55,15 @@ for i in xrange(0, main_size, 6):
     a, b = b, a + b
     offset = 4096 + b % 500000
     value = a % 256
-    print '  %%ptr%d = getelementptr i8, i8 *%%base, i64 %d' % (i, offset)
-    print '  store volatile i8 %d, i8 *%%ptr%d' % (value, i)
+    print '  %ptr{0:d} = getelementptr i8, i8 *%base, i64 {1:d}'.format(i, offset)
+    print '  store volatile i8 {0:d}, i8 *%ptr{1:d}'.format(value, i)
 
 for i in xrange(branch_blocks):
-    print '  %%nextcount%d = add i64 %%count%d, -1' % (i, i)
-    print '  %%test%d = icmp ne i64 %%nextcount%d, 0' % (i, i)
-    print '  br i1 %%test%d, label %%loop%d, label %%after%d' % (i, i, i)
+    print '  %nextcount{0:d} = add i64 %count{1:d}, -1'.format(i, i)
+    print '  %test{0:d} = icmp ne i64 %nextcount{1:d}, 0'.format(i, i)
+    print '  br i1 %test{0:d}, label %loop{1:d}, label %after{2:d}'.format(i, i, i)
     print ''
-    print 'after%d:' % i
+    print 'after{0:d}:'.format(i)
 
 print '  ret void'
 print '}'

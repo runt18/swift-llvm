@@ -23,7 +23,7 @@ class ResultCode(object):
         self.isFailure = isFailure
 
     def __repr__(self):
-        return '%s%r' % (self.__class__.__name__,
+        return '{0!s}{1!r}'.format(self.__class__.__name__,
                          (self.name, self.isFailure))
 
 PASS        = ResultCode('PASS', False)
@@ -70,7 +70,7 @@ class RealMetricValue(MetricValue):
         self.value = value
 
     def format(self):
-        return '%.4f' % self.value
+        return '{0:.4f}'.format(self.value)
 
     def todata(self):
         return self.value
@@ -137,10 +137,10 @@ class Result(object):
         Each value must be an instance of a MetricValue subclass.
         """
         if name in self.metrics:
-            raise ValueError("result already includes metrics for %r" % (
-                    name,))
+            raise ValueError("result already includes metrics for {0!r}".format(
+                    name))
         if not isinstance(value, MetricValue):
-            raise TypeError("unexpected metric value: %r" % (value,))
+            raise TypeError("unexpected metric value: {0!r}".format(value))
         self.metrics[name] = value
 
 # Test classes.
@@ -248,7 +248,7 @@ class Test:
 
         xml = "<testcase classname='" + class_name + "' name='" + \
             test_name + "'"
-        xml += " time='%.2f'" % (self.result.elapsed,)
+        xml += " time='{0:.2f}'".format(self.result.elapsed)
         if self.result.code.isFailure:
             xml += ">\n\t<failure >\n" + escape(self.result.output)
             xml += "\n\t</failure>\n</testcase>"

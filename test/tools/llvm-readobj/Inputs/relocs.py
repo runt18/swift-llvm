@@ -205,7 +205,7 @@ class ElfSection:
         else:
           r_info = (r_info & 0xFF00) | (r_type & 0xFF)
 
-        print("    %s" % relocs[ri][0])
+        print("    {0!s}".format(relocs[ri][0]))
         f.seek(pos)
         f.writeWord(r_info)
 
@@ -266,7 +266,7 @@ def patchElf(path, relocs):
   elif fileclass == 2:
     f.is64Bit = True
   else:
-    raise ValueError, "Unknown file class %x" % fileclass
+    raise ValueError, "Unknown file class {0:x}".format(fileclass)
 
   byteordering = f.uint8()
   if byteordering == 1:
@@ -274,7 +274,7 @@ def patchElf(path, relocs):
   elif byteordering == 2:
       f.isLSB = False
   else:
-      raise ValueError, "Unknown byte ordering %x" % byteordering
+      raise ValueError, "Unknown byte ordering {0:x}".format(byteordering)
 
   f.seek(18)
   e_machine = f.uint16()
@@ -339,7 +339,7 @@ def patchCoff(path, relocs):
   for i in range(section.relocation_count):
     virtual_addr = f.uint32()
     symtab_idx   = f.uint32()
-    print("    %s" % relocs[i][0])
+    print("    {0!s}".format(relocs[i][0]))
     f.writeUInt16(relocs[i][1])
 
 
@@ -375,7 +375,7 @@ def patchMacho(filename, relocs):
   elif magic == '\xCF\xFA\xED\xFE':
     f.isLSB, f.is64Bit = True, True
   else:
-    raise ValueError,"Not a Mach-O object file: %r (bad magic)" % path
+    raise ValueError,"Not a Mach-O object file: {0!r} (bad magic)".format(path)
 
   cputype = f.uint32()
   cpusubtype = f.uint32()
@@ -392,7 +392,7 @@ def patchMacho(filename, relocs):
     patchMachoLoadCommand(f, relocs)
 
   if f.tell() - start != loadCommandsSize:
-    raise ValueError,"%s: warning: invalid load commands size: %r" % (
+    raise ValueError,"{0!s}: warning: invalid load commands size: {1!r}".format(
       sys.argv[0], loadCommandsSize)
 
 def patchMachoLoadCommand(f, relocs):
@@ -408,7 +408,7 @@ def patchMachoLoadCommand(f, relocs):
     f.read(cmdSize - 8)
 
   if f.tell() - start != cmdSize:
-    raise ValueError,"%s: warning: invalid load command size: %r" % (
+    raise ValueError,"{0!s}: warning: invalid load command size: {1!r}".format(
       sys.argv[0], cmdSize)
 
 def patchMachoSegmentLoadCommand(f, relocs):
@@ -444,7 +444,7 @@ def patchMachoSection(f, relocs):
   f.seek(relocOffset)
   for i in range(numReloc):
     ri = i < len(relocs) and i or 0
-    print("    %s" % relocs[ri][0])
+    print("    {0!s}".format(relocs[ri][0]))
     word1 = f.uint32()
     pos = f.tell()
     value = f.uint32()

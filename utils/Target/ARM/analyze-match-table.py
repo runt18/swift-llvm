@@ -37,9 +37,9 @@ def analyze_match_table(path):
     condcode_mnemonics = set(m for m in mnemonics
                              if 'MCK_CondCode' in mnemonic_flags[m])
     noncondcode_mnemonics = mnemonics - condcode_mnemonics
-    print ' || '.join('Mnemonic == "%s"' % m
+    print ' || '.join('Mnemonic == "{0!s}"'.format(m)
                       for m in ccout_mnemonics)
-    print ' || '.join('Mnemonic == "%s"' % m
+    print ' || '.join('Mnemonic == "{0!s}"'.format(m)
                       for m in noncondcode_mnemonics)
 
 def main():

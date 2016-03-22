@@ -133,18 +133,18 @@ def printHistogram(items, title = 'Items'):
 
     barW = 40
     hr = '-' * (barW + 34)
-    print('\nSlowest %s:' % title)
+    print('\nSlowest {0!s}:'.format(title))
     print(hr)
     for name,value in items[-20:]:
-        print('%.2fs: %s' % (value, name))
-    print('\n%s Times:' % title)
+        print('{0:.2f}s: {1!s}'.format(value, name))
+    print('\n{0!s} Times:'.format(title))
     print(hr)
     pDigits = int(math.ceil(math.log(maxValue, 10)))
     pfDigits = max(0, 3-pDigits)
     if pfDigits:
         pDigits += pfDigits + 1
     cDigits = int(math.ceil(math.log(len(items), 10)))
-    print("[%s] :: [%s] :: [%s]" % ('Range'.center((pDigits+1)*2 + 3),
+    print("[{0!s}] :: [{1!s}] :: [{2!s}]".format('Range'.center((pDigits+1)*2 + 3),
                                     'Percentage'.center(barW),
                                     'Count'.center(cDigits*2 + 1)))
     print(hr)
@@ -191,5 +191,5 @@ def usePlatformSdkOnDarwin(config, lit_config):
             res = -1
         if res == 0 and out:
             sdk_path = out
-            lit_config.note('using SDKROOT: %r' % sdk_path)
+            lit_config.note('using SDKROOT: {0!r}'.format(sdk_path))
             config.environment['SDKROOT'] = sdk_path

@@ -108,11 +108,11 @@ class OneCommandPerFileTest(TestFormat):
             return lit.Test.PASS,''
 
         # Try to include some useful information.
-        report = """Command: %s\n""" % ' '.join(["'%s'" % a
-                                                 for a in cmd])
+        report = """Command: {0!s}\n""".format(' '.join(["'{0!s}'".format(a)
+                                                 for a in cmd]))
         if self.useTempInput:
-            report += """Temporary File: %s\n""" % tmp.name
+            report += """Temporary File: {0!s}\n""".format(tmp.name)
             report += "--\n%s--\n""" % open(tmp.name).read()
-        report += """Output:\n--\n%s--""" % diags
+        report += """Output:\n--\n{0!s}--""".format(diags)
 
         return lit.Test.FAIL, report

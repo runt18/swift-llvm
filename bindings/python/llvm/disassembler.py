@@ -76,8 +76,8 @@ class Disassembler(LLVMObject):
         ptr = lib.LLVMCreateDisasm(c_char_p(triple), c_void_p(None), c_int(0),
                 callbacks['op_info'](0), callbacks['symbol_lookup'](0))
         if not ptr:
-            raise Exception('Could not obtain disassembler for triple: %s' %
-                            triple)
+            raise Exception('Could not obtain disassembler for triple: {0!s}'.format(
+                            triple))
 
         LLVMObject.__init__(self, ptr, disposer=lib.LLVMDisasmDispose)
 
@@ -143,7 +143,7 @@ class Disassembler(LLVMObject):
 
     def set_options(self, options):
         if not lib.LLVMSetDisasmOptions(self, options):
-            raise Exception('Unable to set all disassembler options in %i' % options)
+            raise Exception('Unable to set all disassembler options in {0:d}'.format(options))
 
 
 def register_library(library):

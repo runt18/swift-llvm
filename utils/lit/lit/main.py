@@ -52,25 +52,25 @@ class TestingProgressDisplay(object):
 
         # Show the test result line.
         test_name = test.getFullName()
-        print('%s: %s (%d of %d)' % (test.result.code.name, test_name,
+        print('{0!s}: {1!s} ({2:d} of {3:d})'.format(test.result.code.name, test_name,
                                      self.completed, self.numTests))
 
         # Show the test failure output, if requested.
         if (test.result.code.isFailure and self.opts.showOutput) or \
            self.opts.showAllOutput:
             if test.result.code.isFailure:
-                print("%s TEST '%s' FAILED %s" % ('*'*20, test.getFullName(),
+                print("{0!s} TEST '{1!s}' FAILED {2!s}".format('*'*20, test.getFullName(),
                                                   '*'*20))
             print(test.result.output)
             print("*" * 20)
 
         # Report test metrics, if present.
         if test.result.metrics:
-            print("%s TEST '%s' RESULTS %s" % ('*'*10, test.getFullName(),
+            print("{0!s} TEST '{1!s}' RESULTS {2!s}".format('*'*10, test.getFullName(),
                                                '*'*10))
             items = sorted(test.result.metrics.items())
             for metric_name, value in items:
-                print('%s: %s ' % (metric_name, value.format()))
+                print('{0!s}: {1!s} '.format(metric_name, value.format()))
             print("*" * 10)
 
         # Ensure the output is flushed.
@@ -247,7 +247,7 @@ def main(builtinParameters = {}):
     (opts, args) = parser.parse_args()
 
     if opts.show_version:
-        print("lit %s" % (lit.__version__,))
+        print("lit {0!s}".format(lit.__version__))
         return
 
     if not args:
@@ -306,9 +306,9 @@ def main(builtinParameters = {}):
         if opts.showSuites:
             print('-- Test Suites --')
             for ts,ts_tests in suitesAndTests:
-                print('  %s - %d tests' %(ts.name, len(ts_tests)))
-                print('    Source Root: %s' % ts.source_root)
-                print('    Exec Root  : %s' % ts.exec_root)
+                print('  {0!s} - {1:d} tests'.format(ts.name, len(ts_tests)))
+                print('    Source Root: {0!s}'.format(ts.source_root))
+                print('    Exec Root  : {0!s}'.format(ts.exec_root))
 
         # Show the tests, if requested.
         if opts.showTests:
@@ -316,7 +316,7 @@ def main(builtinParameters = {}):
             for ts,ts_tests in suitesAndTests:
                 ts_tests.sort(key = lambda test: test.path_in_suite)
                 for test in ts_tests:
-                    print('  %s' % (test.getFullName(),))
+                    print('  {0!s}'.format(test.getFullName()))
 
         # Exit.
         sys.exit(0)
@@ -329,8 +329,8 @@ def main(builtinParameters = {}):
         try:
             rex = re.compile(opts.filter)
         except:
-            parser.error("invalid regular expression for --filter: %r" % (
-                    opts.filter))
+            parser.error("invalid regular expression for --filter: {0!r}".format((
+                    opts.filter)))
         run.tests = [result_test for result_test in run.tests
                      if rex.search(result_test.getFullName())]
 
@@ -366,15 +366,14 @@ def main(builtinParameters = {}):
 
         if max_procs_soft < desired_limit:
             resource.setrlimit(resource.RLIMIT_NPROC, (desired_limit, max_procs_hard))
-            litConfig.note('raised the process limit from %d to %d' % \
-                               (max_procs_soft, desired_limit))
+            litConfig.note('raised the process limit from {0:d} to {1:d}'.format(max_procs_soft, desired_limit))
     except:
         pass
 
     extra = ''
     if len(run.tests) != numTotalTests:
-        extra = ' of %d' % numTotalTests
-    header = '-- Testing: %d%s tests, %d threads --'%(len(run.tests), extra,
+        extra = ' of {0:d}'.format(numTotalTests)
+    header = '-- Testing: {0:d}{1!s} tests, {2:d} threads --'.format(len(run.tests), extra,
                                                       opts.numThreads)
 
     progressBar = None
@@ -400,7 +399,7 @@ def main(builtinParameters = {}):
 
     testing_time = time.time() - startTime
     if not opts.quiet:
-        print('Testing Time: %.2fs' % (testing_time,))
+        print('Testing Time: {0:.2f}s'.format(testing_time))
 
     # Write out the test data, if requested.
     if opts.output_path is not None:
@@ -429,9 +428,9 @@ def main(builtinParameters = {}):
         if not elts:
             continue
         print('*'*20)
-        print('%s (%d):' % (title, len(elts)))
+        print('{0!s} ({1:d}):'.format(title, len(elts)))
         for test in elts:
-            print('    %s' % test.getFullName())
+            print('    {0!s}'.format(test.getFullName()))
         sys.stdout.write('\n')
 
     if opts.timeTests and run.tests:
@@ -451,7 +450,7 @@ def main(builtinParameters = {}):
             continue
         N = len(byCode.get(code,[]))
         if N:
-            print('  %s: %d' % (name,N))
+            print('  {0!s}: {1:d}'.format(name, N))
 
     if opts.xunit_output_file:
         # Collect the tests, indexed by test suite
@@ -486,12 +485,12 @@ def main(builtinParameters = {}):
 
     # If we encountered any additional errors, exit abnormally.
     if litConfig.numErrors:
-        sys.stderr.write('\n%d error(s), exiting.\n' % litConfig.numErrors)
+        sys.stderr.write('\n{0:d} error(s), exiting.\n'.format(litConfig.numErrors))
         sys.exit(2)
 
     # Warn about warnings.
     if litConfig.numWarnings:
-        sys.stderr.write('\n%d warning(s) in tests.\n' % litConfig.numWarnings)
+        sys.stderr.write('\n{0:d} warning(s) in tests.\n'.format(litConfig.numWarnings))
 
     if hasFailures:
         sys.exit(1)

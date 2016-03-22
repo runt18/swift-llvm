@@ -4,7 +4,7 @@ class Command:
         self.redirects = list(redirects)
 
     def __repr__(self):
-        return 'Command(%r, %r)' % (self.args, self.redirects)
+        return 'Command({0!r}, {1!r})'.format(self.args, self.redirects)
 
     def __eq__(self, other):
         if not isinstance(other, Command):
@@ -16,24 +16,24 @@ class Command:
     def toShell(self, file):
         for arg in self.args:
             if "'" not in arg:
-                quoted = "'%s'" % arg
+                quoted = "'{0!s}'".format(arg)
             elif '"' not in arg and '$' not in arg:
-                quoted = '"%s"' % arg
+                quoted = '"{0!s}"'.format(arg)
             else:
-                raise NotImplementedError('Unable to quote %r' % arg)
+                raise NotImplementedError('Unable to quote {0!r}'.format(arg))
             file.write(quoted)
 
             # For debugging / validation.
             import ShUtil
             dequoted = list(ShUtil.ShLexer(quoted).lex())
             if dequoted != [arg]:
-                raise NotImplementedError('Unable to quote %r' % arg)
+                raise NotImplementedError('Unable to quote {0!r}'.format(arg))
 
         for r in self.redirects:
             if len(r[0]) == 1:
-                file.write("%s '%s'" % (r[0][0], r[1]))
+                file.write("{0!s} '{1!s}'".format(r[0][0], r[1]))
             else:
-                file.write("%s%s '%s'" % (r[0][1], r[0][0], r[1]))
+                file.write("{0!s}{1!s} '{2!s}'".format(r[0][1], r[0][0], r[1]))
 
 class Pipeline:
     def __init__(self, commands, negate=False, pipe_err=False):
@@ -42,7 +42,7 @@ class Pipeline:
         self.pipe_err = pipe_err
 
     def __repr__(self):
-        return 'Pipeline(%r, %r, %r)' % (self.commands, self.negate,
+        return 'Pipeline({0!r}, {1!r}, {2!r})'.format(self.commands, self.negate,
                                          self.pipe_err)
 
     def __eq__(self, other):
@@ -70,7 +70,7 @@ class Seq:
         self.rhs = rhs
 
     def __repr__(self):
-        return 'Seq(%r, %r, %r)' % (self.lhs, self.op, self.rhs)
+        return 'Seq({0!r}, {1!r}, {2!r})'.format(self.lhs, self.op, self.rhs)
 
     def __eq__(self, other):
         if not isinstance(other, Seq):
@@ -81,5 +81,5 @@ class Seq:
 
     def toShell(self, file, pipefail=False):
         self.lhs.toShell(file, pipefail)
-        file.write(' %s\n' % self.op)
+        file.write(' {0!s}\n'.format(self.op))
         self.rhs.toShell(file, pipefail)

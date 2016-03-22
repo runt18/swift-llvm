@@ -43,7 +43,7 @@ class LLVMEnumeration(object):
         self.value = value
 
     def __repr__(self):
-        return '%s.%s' % (self.__class__.__name__,
+        return '{0!s}.{1!s}'.format(self.__class__.__name__,
                           self.name)
 
     @classmethod
@@ -52,7 +52,7 @@ class LLVMEnumeration(object):
         result = cls._value_map.get(value, None)
 
         if result is None:
-            raise ValueError('Unknown %s: %d' % (cls.__name__,
+            raise ValueError('Unknown {0!s}: {1:d}'.format(cls.__name__,
                                                  value))
 
         return result
@@ -65,7 +65,7 @@ class LLVMEnumeration(object):
         enumerations. You should not need to call this outside this module.
         """
         if value in cls._value_map:
-            raise ValueError('%s value already registered: %d' % (cls.__name__,
+            raise ValueError('{0!s} value already registered: {1:d}'.format(cls.__name__,
                                                                   value))
         enum = cls(name, value)
         cls._value_map[value] = enum
@@ -162,7 +162,7 @@ class MemoryBuffer(LLVMObject):
                 byref(memory), byref(out))
 
         if result:
-            raise Exception("Could not create memory buffer: %s" % out.value)
+            raise Exception("Could not create memory buffer: {0!s}".format(out.value))
 
         LLVMObject.__init__(self, memory, disposer=lib.LLVMDisposeMemoryBuffer)
 
@@ -264,7 +264,7 @@ class Module(LLVMObject):
         # Result is inverted so 0 means everything was ok.
         result = lib.LLVMPrintModuleToFile(self, filename, byref(out))        
         if result:
-            raise RuntimeError("LLVM Error: %s" % out.value)
+            raise RuntimeError("LLVM Error: {0!s}".format(out.value))
 
 class Function(Value):
 

@@ -21,7 +21,7 @@
 # which is used as a base pointer.
 args = (8168 - 160) / 8 + (5 - 1)
 
-print 'declare i64 *@foo(i64 *%s)' % (', i64' * args)
+print 'declare i64 *@foo(i64 *{0!s})'.format((', i64' * args))
 print 'declare void @bar(i64 *)'
 print ''
 print 'define i64 @f1(i64 %foo) {'
@@ -30,22 +30,22 @@ print 'entry:'
 # Make the allocation big, so that it goes at the top of the frame.
 print '  %array = alloca [1000 x i64]'
 print '  %area = getelementptr [1000 x i64], [1000 x i64] *%array, i64 0, i64 0'
-print '  %%base = call i64 *@foo(i64 *%%area%s)' % (', i64 0' * args)
+print '  %base = call i64 *@foo(i64 *%area{0!s})'.format((', i64 0' * args))
 print ''
 
 # Make sure all GPRs are used.  One is needed for the stack pointer and
 # another for %base, so we need 14 live values.
 count = 14
 for i in range(count):
-    print '  %%ptr%d = getelementptr i64, i64 *%%base, i64 %d' % (i, i / 2)
-    print '  %%val%d = load volatile i64 , i64 *%%ptr%d' % (i, i)
+    print '  %ptr{0:d} = getelementptr i64, i64 *%base, i64 {1:d}'.format(i, i / 2)
+    print '  %val{0:d} = load volatile i64 , i64 *%ptr{1:d}'.format(i, i)
     print ''
 
 # Encourage the register allocator to give preference to these %vals
 # by using them several times.
 for j in range(4):
     for i in range(count):
-        print '  store volatile i64 %%val%d, i64 *%%ptr%d' % (i, i)
+        print '  store volatile i64 %val{0:d}, i64 *%ptr{1:d}'.format(i, i)
     print ''
 
 # Copy the incoming argument, which we expect to be spilled, to the frame
@@ -65,7 +65,7 @@ print 'skip:'
 # that they are live across the store of %foo.
 for j in range(4):
     for i in range(count):
-        print '  store volatile i64 %%val%d, i64 *%%ptr%d' % (i, i)
+        print '  store volatile i64 %val{0:d}, i64 *%ptr{1:d}'.format(i, i)
     print ''
 
 print '  call void @bar(i64 *%area)'

@@ -32,7 +32,7 @@ class ComponentInfo(object):
 
     def __init__(self, subpath, name, dependencies, parent):
         if not subpath.startswith('/'):
-            raise ValueError("invalid subpath: %r" % subpath)
+            raise ValueError("invalid subpath: {0!r}".format(subpath))
         self.subpath = subpath
         self.name = name
         self.dependencies = list(dependencies)
@@ -104,10 +104,10 @@ class GroupComponentInfo(ComponentInfo):
 
     def get_llvmbuild_fragment(self):
         return """\
-type = %s
-name = %s
-parent = %s
-""" % (self.type_name, self.name, self.parent)
+type = {0!s}
+name = {1!s}
+parent = {2!s}
+""".format(self.type_name, self.name, self.parent)
 
 class LibraryComponentInfo(ComponentInfo):
     type_name = 'Library'
@@ -156,18 +156,18 @@ class LibraryComponentInfo(ComponentInfo):
 
     def get_llvmbuild_fragment(self):
         result = """\
-type = %s
-name = %s
-parent = %s
-""" % (self.type_name, self.name, self.parent)
+type = {0!s}
+name = {1!s}
+parent = {2!s}
+""".format(self.type_name, self.name, self.parent)
         if self.library_name is not None:
-            result += 'library_name = %s\n' % self.library_name
+            result += 'library_name = {0!s}\n'.format(self.library_name)
         if self.required_libraries:
-            result += 'required_libraries = %s\n' % ' '.join(
-                self.required_libraries)
+            result += 'required_libraries = {0!s}\n'.format(' '.join(
+                self.required_libraries))
         if self.add_to_library_groups:
-            result += 'add_to_library_groups = %s\n' % ' '.join(
-                self.add_to_library_groups)
+            result += 'add_to_library_groups = {0!s}\n'.format(' '.join(
+                self.add_to_library_groups))
         if not self.installed:
             result += 'installed = 0\n'
         return result
@@ -190,7 +190,7 @@ parent = %s
         if basename in ('gtest', 'gtest_main'):
             return basename
 
-        return 'LLVM%s' % basename
+        return 'LLVM{0!s}'.format(basename)
 
     def get_llvmconfig_component_name(self):
         return self.get_library_name().lower()
@@ -242,16 +242,16 @@ class LibraryGroupComponentInfo(ComponentInfo):
 
     def get_llvmbuild_fragment(self):
         result = """\
-type = %s
-name = %s
-parent = %s
-""" % (self.type_name, self.name, self.parent)
+type = {0!s}
+name = {1!s}
+parent = {2!s}
+""".format(self.type_name, self.name, self.parent)
         if self.required_libraries and not self._is_special_group:
-            result += 'required_libraries = %s\n' % ' '.join(
-                self.required_libraries)
+            result += 'required_libraries = {0!s}\n'.format(' '.join(
+                self.required_libraries))
         if self.add_to_library_groups:
-            result += 'add_to_library_groups = %s\n' % ' '.join(
-                self.add_to_library_groups)
+            result += 'add_to_library_groups = {0!s}\n'.format(' '.join(
+                self.add_to_library_groups))
         return result
 
     def get_llvmconfig_component_name(self):
@@ -315,20 +315,20 @@ class TargetGroupComponentInfo(ComponentInfo):
 
     def get_llvmbuild_fragment(self):
         result = """\
-type = %s
-name = %s
-parent = %s
-""" % (self.type_name, self.name, self.parent)
+type = {0!s}
+name = {1!s}
+parent = {2!s}
+""".format(self.type_name, self.name, self.parent)
         if self.required_libraries:
-            result += 'required_libraries = %s\n' % ' '.join(
-                self.required_libraries)
+            result += 'required_libraries = {0!s}\n'.format(' '.join(
+                self.required_libraries))
         if self.add_to_library_groups:
-            result += 'add_to_library_groups = %s\n' % ' '.join(
-                self.add_to_library_groups)
+            result += 'add_to_library_groups = {0!s}\n'.format(' '.join(
+                self.add_to_library_groups))
         for bool_key in ('has_asmparser', 'has_asmprinter', 'has_disassembler',
                          'has_jit'):
             if getattr(self, bool_key):
-                result += '%s = 1\n' % (bool_key,)
+                result += '{0!s} = 1\n'.format(bool_key)
         return result
 
     def get_llvmconfig_component_name(self):
@@ -359,11 +359,11 @@ class ToolComponentInfo(ComponentInfo):
 
     def get_llvmbuild_fragment(self):
         return """\
-type = %s
-name = %s
-parent = %s
-required_libraries = %s
-""" % (self.type_name, self.name, self.parent,
+type = {0!s}
+name = {1!s}
+parent = {2!s}
+required_libraries = {3!s}
+""".format(self.type_name, self.name, self.parent,
        ' '.join(self.required_libraries))
 
 class BuildToolComponentInfo(ToolComponentInfo):
@@ -392,13 +392,13 @@ class IniFormatParser(dict):
         if not value:
             return None
         if len(value) > 1:
-            raise ParseError("multiple values for scalar key: %r" % key)
+            raise ParseError("multiple values for scalar key: {0!r}".format(key))
         return value[0]
 
     def get_string(self, key):
         value = self.get_optional_string(key)
         if not value:
-            raise ParseError("missing value for required string: %r" % key)
+            raise ParseError("missing value for required string: {0!r}".format(key))
         return value
 
     def get_optional_bool(self, key, default = None):
@@ -406,14 +406,14 @@ class IniFormatParser(dict):
         if not value:
             return default
         if value not in ('0', '1'):
-            raise ParseError("invalid value(%r) for boolean property: %r" % (
+            raise ParseError("invalid value({0!r}) for boolean property: {1!r}".format(
                     value, key))
         return bool(int(value))
 
     def get_bool(self, key):
         value = self.get_optional_bool(key)
         if value is None:
-            raise ParseError("missing value for required boolean: %r" % key)
+            raise ParseError("missing value for required boolean: {0!r}".format(key))
         return value
 
 _component_type_map = dict(
@@ -442,33 +442,33 @@ def _read_components_from_parser(parser, path, subpath):
     for section in parser.sections():
         if not section.startswith('component'):
             # We don't expect arbitrary sections currently, warn the user.
-            warning("ignoring unknown section %r in %r" % (section, path))
+            warning("ignoring unknown section {0!r} in {1!r}".format(section, path))
             continue
 
         # Determine the type of the component to instantiate.
         if not parser.has_option(section, 'type'):
-            fatal("invalid component %r in %r: %s" % (
+            fatal("invalid component {0!r} in {1!r}: {2!s}".format(
                     section, path, "no component type"))
 
         type_name = parser.get(section, 'type')
         type_class = _component_type_map.get(type_name)
         if type_class is None:
-            fatal("invalid component %r in %r: %s" % (
-                    section, path, "invalid component type: %r" % type_name))
+            fatal("invalid component {0!r} in {1!r}: {2!s}".format(
+                    section, path, "invalid component type: {0!r}".format(type_name)))
 
         # Instantiate the component based on the remaining values.
         try:
             info = type_class.parse(subpath,
                                     IniFormatParser(parser.items(section)))
         except TypeError:
-            print >>sys.stderr, "error: invalid component %r in %r: %s" % (
-                section, path, "unable to instantiate: %r" % type_name)
+            print >>sys.stderr, "error: invalid component {0!r} in {1!r}: {2!s}".format(
+                section, path, "unable to instantiate: {0!r}".format(type_name))
             import traceback
             traceback.print_exc()
             raise SystemExit(1)
         except ParseError:
             e = sys.exc_info()[1]
-            fatal("unable to load component %r in %r: %s" % (
+            fatal("unable to load component {0!r} in {1!r}: {2!s}".format(
                     section, path, e.message))
 
         info._source_path = path

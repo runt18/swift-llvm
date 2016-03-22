@@ -109,12 +109,11 @@ def main():
 
   if args.verbose:
     # Print out the shuffle sequence in a compact form.
-    print >>sys.stderr, ('Testing shuffle sequence "%s" (v%d%s):' %
-                         (args.seed, width, element_type))
+    print >>sys.stderr, ('Testing shuffle sequence "{0!s}" (v{1:d}{2!s}):'.format(args.seed, width, element_type))
     for i, shuffles in enumerate(shuffle_tree):
-      print >>sys.stderr, '  tree level %d:' % (i,)
+      print >>sys.stderr, '  tree level {0:d}:'.format(i)
       for j, s in enumerate(shuffles):
-        print >>sys.stderr, '    shuffle %d: %s' % (j, s)
+        print >>sys.stderr, '    shuffle {0:d}: {1!s}'.format(j, s)
     print >>sys.stderr, ''
 
   # Symbolically evaluate the shuffle tree.
@@ -128,14 +127,14 @@ def main():
                 for j in s]
                for i, s in enumerate(shuffles)]
   if len(results) != 1:
-    print >>sys.stderr, 'ERROR: Bad results: %s' % (results,)
+    print >>sys.stderr, 'ERROR: Bad results: {0!s}'.format(results)
     sys.exit(1)
   result = results[0]
 
   if args.verbose:
     print >>sys.stderr, 'Which transforms:'
-    print >>sys.stderr, '  from: %s' % (inputs,)
-    print >>sys.stderr, '  into: %s' % (result,)
+    print >>sys.stderr, '  from: {0!s}'.format(inputs)
+    print >>sys.stderr, '  into: {0!s}'.format(result)
     print >>sys.stderr, ''
 
   # The IR uses silly names for floating point types. We also need a same-size
@@ -151,11 +150,11 @@ def main():
   # Now we need to generate IR for the shuffle function.
   subst = {'N': width, 'T': element_type, 'IT': integral_element_type}
   print """
-define internal fastcc <%(N)d x %(T)s> @test(%(arguments)s) noinline nounwind {
-entry:""" % dict(subst,
+define internal fastcc <{N:d} x {T!s}> @test({arguments!s}) noinline nounwind {{
+entry:""".format(**dict(subst,
                  arguments=', '.join(
-                     ['<%(N)d x %(T)s> %%s.0.%(i)d' % dict(subst, i=i)
-                      for i in xrange(args.max_shuffle_height + 1)]))
+                     ['<{N:d} x {T!s}> %s.0.{i:d}'.format(**dict(subst, i=i))
+                      for i in xrange(args.max_shuffle_height + 1)])))
 
   for i, shuffles in enumerate(shuffle_tree):
    for j, s in enumerate(shuffles):
@@ -166,15 +165,15 @@ entry:""" % dict(subst,
                                     for si in s]))
 
   print """
-  ret <%(N)d x %(T)s> %%s.%(i)d.0
-}
-""" % dict(subst, i=len(shuffle_tree))
+  ret <{N:d} x {T!s}> %s.{i:d}.0
+}}
+""".format(**dict(subst, i=len(shuffle_tree)))
 
   # Generate some string constants that we can use to report errors.
   for i, r in enumerate(result):
     if r != -1:
-      s = ('FAIL(%(seed)s): lane %(lane)d, expected %(result)d, found %%d\n\\0A' %
-           {'seed': args.seed, 'lane': i, 'result': r})
+      s = ('FAIL({seed!s}): lane {lane:d}, expected {result:d}, found %d\n\\0A'.format(**
+           {'seed': args.seed, 'lane': i, 'result': r}))
       s += ''.join(['\\00' for _ in itertools.repeat(None, 128 - len(s) + 2)])
       print """
 @error.%(i)d = private unnamed_addr global [128 x i8] c"%(s)s"
@@ -183,73 +182,73 @@ entry:""" % dict(subst,
   # Define a wrapper function which is marked 'optnone' to prevent
   # interprocedural optimizations from deleting the test.
   print """
-define internal fastcc <%(N)d x %(T)s> @test_wrapper(%(arguments)s) optnone noinline {
-  %%result = call fastcc <%(N)d x %(T)s> @test(%(arguments)s)
-  ret <%(N)d x %(T)s> %%result
-}
-""" % dict(subst,
-           arguments=', '.join(['<%(N)d x %(T)s> %%s.%(i)d' % dict(subst, i=i)
-                                for i in xrange(args.max_shuffle_height + 1)]))
+define internal fastcc <{N:d} x {T!s}> @test_wrapper({arguments!s}) optnone noinline {{
+  %result = call fastcc <{N:d} x {T!s}> @test({arguments!s})
+  ret <{N:d} x {T!s}> %result
+}}
+""".format(**dict(subst,
+           arguments=', '.join(['<{N:d} x {T!s}> %s.{i:d}'.format(**dict(subst, i=i))
+                                for i in xrange(args.max_shuffle_height + 1)])))
 
   # Finally, generate a main function which will trap if any lanes are mapped
   # incorrectly (in an observable way).
   print """
-define i32 @main() {
+define i32 @main() {{
 entry:
   ; Create a scratch space to print error messages.
-  %%str = alloca [128 x i8]
-  %%str.ptr = getelementptr inbounds [128 x i8]* %%str, i32 0, i32 0
+  %str = alloca [128 x i8]
+  %str.ptr = getelementptr inbounds [128 x i8]* %str, i32 0, i32 0
 
   ; Build the input vector and call the test function.
-  %%v = call fastcc <%(N)d x %(T)s> @test_wrapper(%(inputs)s)
+  %v = call fastcc <{N:d} x {T!s}> @test_wrapper({inputs!s})
   ; We need to cast this back to an integer type vector to easily check the
   ; result.
-  %%v.cast = bitcast <%(N)d x %(T)s> %%v to <%(N)d x %(IT)s>
-  br label %%test.0
-""" % dict(subst,
+  %v.cast = bitcast <{N:d} x {T!s}> %v to <{N:d} x {IT!s}>
+  br label %test.0
+""".format(**dict(subst,
            inputs=', '.join(
                [('<%(N)d x %(T)s> bitcast '
                  '(<%(N)d x %(IT)s> <%(input)s> to <%(N)d x %(T)s>)' %
-                 dict(subst, input=', '.join(['%(IT)s %(i)d' % dict(subst, i=i)
+                 dict(subst, input=', '.join(['{IT!s} {i:d}'.format(**dict(subst, i=i))
                                               for i in input])))
-                for input in inputs]))
+                for input in inputs])))
 
   # Test that each non-undef result lane contains the expected value.
   for i, r in enumerate(result):
     if r == -1:
       print """
-test.%(i)d:
+test.{i:d}:
   ; Skip this lane, its value is undef.
-  br label %%test.%(next_i)d
-""" % dict(subst, i=i, next_i=i + 1)
+  br label %test.{next_i:d}
+""".format(**dict(subst, i=i, next_i=i + 1))
     else:
       print """
-test.%(i)d:
-  %%v.%(i)d = extractelement <%(N)d x %(IT)s> %%v.cast, i32 %(i)d
-  %%cmp.%(i)d = icmp ne %(IT)s %%v.%(i)d, %(r)d
-  br i1 %%cmp.%(i)d, label %%die.%(i)d, label %%test.%(next_i)d
+test.{i:d}:
+  %v.{i:d} = extractelement <{N:d} x {IT!s}> %v.cast, i32 {i:d}
+  %cmp.{i:d} = icmp ne {IT!s} %v.{i:d}, {r:d}
+  br i1 %cmp.{i:d}, label %die.{i:d}, label %test.{next_i:d}
 
-die.%(i)d:
+die.{i:d}:
   ; Capture the actual value and print an error message.
-  %%tmp.%(i)d = zext %(IT)s %%v.%(i)d to i2048
-  %%bad.%(i)d = trunc i2048 %%tmp.%(i)d to i32
-  call i32 (i8*, i8*, ...)* @sprintf(i8* %%str.ptr, i8* getelementptr inbounds ([128 x i8]* @error.%(i)d, i32 0, i32 0), i32 %%bad.%(i)d)
-  %%length.%(i)d = call i32 @strlen(i8* %%str.ptr)
-  call i32 @write(i32 2, i8* %%str.ptr, i32 %%length.%(i)d)
+  %tmp.{i:d} = zext {IT!s} %v.{i:d} to i2048
+  %bad.{i:d} = trunc i2048 %tmp.{i:d} to i32
+  call i32 (i8*, i8*, ...)* @sprintf(i8* %str.ptr, i8* getelementptr inbounds ([128 x i8]* @error.{i:d}, i32 0, i32 0), i32 %bad.{i:d})
+  %length.{i:d} = call i32 @strlen(i8* %str.ptr)
+  call i32 @write(i32 2, i8* %str.ptr, i32 %length.{i:d})
   call void @llvm.trap()
   unreachable
-""" % dict(subst, i=i, next_i=i + 1, r=r)
+""".format(**dict(subst, i=i, next_i=i + 1, r=r))
 
   print """
-test.%d:
+test.{0:d}:
   ret i32 0
-}
+}}
 
 declare i32 @strlen(i8*)
 declare i32 @write(i32, i8*, i32)
 declare i32 @sprintf(i8*, i8*, ...)
 declare void @llvm.trap() noreturn nounwind
-""" % (len(result),)
+""".format(len(result))
 
 if __name__ == '__main__':
   main()

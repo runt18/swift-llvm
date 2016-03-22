@@ -57,7 +57,7 @@ def executeShCmd(cmd, shenv, results):
                 res = executeShCmd(cmd.rhs, shenv, results)
             return res
 
-        raise ValueError('Unknown shell command: %r' % cmd.op)
+        raise ValueError('Unknown shell command: {0!r}'.format(cmd.op))
     assert isinstance(cmd, ShUtil.Pipeline)
 
     # Handle shell builtins first.
@@ -123,7 +123,7 @@ def executeShCmd(cmd, shenv, results):
             elif r[0] == ('<',):
                 redirects[0] = [r[1], 'r', None]
             else:
-                raise InternalShellError(j,"Unsupported redirect: %r" % (r,))
+                raise InternalShellError(j,"Unsupported redirect: {0!r}".format(r))
 
         # Map from the final redirections to something subprocess can handle.
         final_redirects = []
@@ -187,7 +187,7 @@ def executeShCmd(cmd, shenv, results):
         if not executable:
             executable = lit.util.which(args[0], cmd_shenv.env['PATH'])
         if not executable:
-            raise InternalShellError(j, '%r: command not found' % j.args[0])
+            raise InternalShellError(j, '{0!r}: command not found'.format(j.args[0]))
 
         # Replace uses of /dev/null with temporary files.
         if kAvoidDevNull:
@@ -302,7 +302,7 @@ def executeScriptInternal(test, litConfig, tmpBase, commands, cwd):
             cmds.append(ShUtil.ShParser(ln, litConfig.isWindows,
                                         test.config.pipefail).parse())
         except:
-            return lit.Test.Result(Test.FAIL, "shell parser error on: %r" % ln)
+            return lit.Test.Result(Test.FAIL, "shell parser error on: {0!r}".format(ln))
 
     cmd = cmds[0]
     for c in cmds[1:]:
@@ -319,10 +319,10 @@ def executeScriptInternal(test, litConfig, tmpBase, commands, cwd):
 
     out = err = ''
     for i,(cmd, cmd_out,cmd_err,res) in enumerate(results):
-        out += 'Command %d: %s\n' % (i, ' '.join('"%s"' % s for s in cmd.args))
-        out += 'Command %d Result: %r\n' % (i, res)
-        out += 'Command %d Output:\n%s\n\n' % (i, cmd_out)
-        out += 'Command %d Stderr:\n%s\n\n' % (i, cmd_err)
+        out += 'Command {0:d}: {1!s}\n'.format(i, ' '.join('"{0!s}"'.format(s) for s in cmd.args))
+        out += 'Command {0:d} Result: {1!r}\n'.format(i, res)
+        out += 'Command {0:d} Output:\n{1!s}\n\n'.format(i, cmd_out)
+        out += 'Command {0:d} Stderr:\n{1!s}\n\n'.format(i, cmd_err)
 
     return out, err, exitCode
 
@@ -382,7 +382,7 @@ def parseIntegratedTestScriptCommands(source_path, keywords):
     # version.
 
     keywords_re = re.compile(
-        to_bytes("(%s)(.*)\n" % ("|".join(k for k in keywords),)))
+        to_bytes("({0!s})(.*)\n".format("|".join(k for k in keywords))))
 
     f = open(source_path, 'rb')
     try:
@@ -515,8 +515,8 @@ def parseIntegratedTestScript(test, require_script=True):
             if not ln.strip():
                 break
         else:
-            raise ValueError("unknown script command type: %r" % (
-                    command_type,))
+            raise ValueError("unknown script command type: {0!r}".format(
+                    command_type))
 
     # Verify the script contains a run line.
     if require_script and not script:
@@ -533,20 +533,20 @@ def parseIntegratedTestScript(test, require_script=True):
     if missing_required_features:
         msg = ', '.join(missing_required_features)
         return lit.Test.Result(Test.UNSUPPORTED,
-                               "Test requires the following features: %s" % msg)
+                               "Test requires the following features: {0!s}".format(msg))
     unsupported_features = [f for f in unsupported
                             if f in test.config.available_features]
     if unsupported_features:
         msg = ', '.join(unsupported_features)
         return lit.Test.Result(Test.UNSUPPORTED,
-                    "Test is unsupported with the following features: %s" % msg)
+                    "Test is unsupported with the following features: {0!s}".format(msg))
 
     unsupported_targets = [f for f in unsupported
                            if f in test.suite.config.target_triple]
     if unsupported_targets:
       return lit.Test.Result(Test.UNSUPPORTED,
-                  "Test is unsupported with the following triple: %s" % (
-                      test.suite.config.target_triple,))
+                  "Test is unsupported with the following triple: {0!s}".format(
+                      test.suite.config.target_triple))
 
     if test.config.limit_to_features:
         # Check that we have one of the limit_to_features features in requires.
@@ -555,7 +555,7 @@ def parseIntegratedTestScript(test, require_script=True):
         if not limit_to_features_tests:
             msg = ', '.join(test.config.limit_to_features)
             return lit.Test.Result(Test.UNSUPPORTED,
-                 "Test requires one of the limit_to_features features %s" % msg)
+                 "Test requires one of the limit_to_features features {0!s}".format(msg))
 
     return script
 
@@ -578,14 +578,14 @@ def _runShTest(test, litConfig, useExternalSh, script, tmpBase):
         status = Test.FAIL
 
     # Form the output log.
-    output = """Script:\n--\n%s\n--\nExit Code: %d\n\n""" % (
+    output = """Script:\n--\n{0!s}\n--\nExit Code: {1:d}\n\n""".format(
         '\n'.join(script), exitCode)
 
     # Append the outputs, if present.
     if out:
-        output += """Command Output (stdout):\n--\n%s\n--\n""" % (out,)
+        output += """Command Output (stdout):\n--\n{0!s}\n--\n""".format(out)
     if err:
-        output += """Command Output (stderr):\n--\n%s\n--\n""" % (err,)
+        output += """Command Output (stderr):\n--\n{0!s}\n--\n""".format(err)
 
     return lit.Test.Result(status, output)
 

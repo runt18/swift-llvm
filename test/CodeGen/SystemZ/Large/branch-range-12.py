@@ -96,32 +96,32 @@ print '  br label %before0'
 print ''
 
 for i in xrange(branch_blocks):
-    next = 'before%d' % (i + 1) if i + 1 < branch_blocks else 'main'
-    print 'before%d:' % i
-    print '  %%bcur%da = load i64 , i64 *%%stopa' % i
-    print '  %%bcur%db = load i64 , i64 *%%stopb' % i
-    print '  %%bsub%d = sub i64 %%bcur%da, %%bcur%db' % (i, i, i)
-    print '  %%btest%d = icmp ult i64 %%bsub%d, %d' % (i, i, i + 50)
-    print '  br i1 %%btest%d, label %%after0, label %%%s' % (i, next)
+    next = 'before{0:d}'.format((i + 1)) if i + 1 < branch_blocks else 'main'
+    print 'before{0:d}:'.format(i)
+    print '  %bcur{0:d}a = load i64 , i64 *%stopa'.format(i)
+    print '  %bcur{0:d}b = load i64 , i64 *%stopb'.format(i)
+    print '  %bsub{0:d} = sub i64 %bcur{1:d}a, %bcur{2:d}b'.format(i, i, i)
+    print '  %btest{0:d} = icmp ult i64 %bsub{1:d}, {2:d}'.format(i, i, i + 50)
+    print '  br i1 %btest{0:d}, label %after0, label %{1!s}'.format(i, next)
     print ''
 
-print '%s:' % next
+print '{0!s}:'.format(next)
 a, b = 1, 1
 for i in xrange(0, main_size, 6):
     a, b = b, a + b
     offset = 4096 + b % 500000
     value = a % 256
-    print '  %%ptr%d = getelementptr i8, i8 *%%base, i64 %d' % (i, offset)
-    print '  store volatile i8 %d, i8 *%%ptr%d' % (value, i)
+    print '  %ptr{0:d} = getelementptr i8, i8 *%base, i64 {1:d}'.format(i, offset)
+    print '  store volatile i8 {0:d}, i8 *%ptr{1:d}'.format(value, i)
 
 for i in xrange(branch_blocks):
-    print '  %%acur%da = load i64 , i64 *%%stopa' % i
-    print '  %%acur%db = load i64 , i64 *%%stopb' % i
-    print '  %%asub%d = sub i64 %%acur%da, %%acur%db' % (i, i, i)
-    print '  %%atest%d = icmp ult i64 %%asub%d, %d' % (i, i, i + 100)
-    print '  br i1 %%atest%d, label %%main, label %%after%d' % (i, i)
+    print '  %acur{0:d}a = load i64 , i64 *%stopa'.format(i)
+    print '  %acur{0:d}b = load i64 , i64 *%stopb'.format(i)
+    print '  %asub{0:d} = sub i64 %acur{1:d}a, %acur{2:d}b'.format(i, i, i)
+    print '  %atest{0:d} = icmp ult i64 %asub{1:d}, {2:d}'.format(i, i, i + 100)
+    print '  br i1 %atest{0:d}, label %main, label %after{1:d}'.format(i, i)
     print ''
-    print 'after%d:' % i
+    print 'after{0:d}:'.format(i)
 
 print '  ret void'
 print '}'
