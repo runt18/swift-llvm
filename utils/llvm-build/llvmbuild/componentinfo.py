@@ -220,8 +220,12 @@ class LibraryGroupComponentInfo(ComponentInfo):
             'add_to_library_groups')
         return LibraryGroupComponentInfo(subpath, **kwargs)
 
-    def __init__(self, subpath, name, parent, required_libraries = [],
-                 add_to_library_groups = []):
+    def __init__(self, subpath, name, parent, required_libraries = None,
+                 add_to_library_groups = None):
+        if required_libraries is None:
+            required_libraries = []
+        if add_to_library_groups is None:
+            add_to_library_groups = []
         ComponentInfo.__init__(self, subpath, name, [], parent)
 
         # The names of the library components which are required when linking
@@ -275,10 +279,14 @@ class TargetGroupComponentInfo(ComponentInfo):
                                                              False)
         return TargetGroupComponentInfo(subpath, **kwargs)
 
-    def __init__(self, subpath, name, parent, required_libraries = [],
-                 add_to_library_groups = [], has_jit = False,
+    def __init__(self, subpath, name, parent, required_libraries = None,
+                 add_to_library_groups = None, has_jit = False,
                  has_asmprinter = False, has_asmparser = False,
                  has_disassembler = False):
+        if required_libraries is None:
+            required_libraries = []
+        if add_to_library_groups is None:
+            add_to_library_groups = []
         ComponentInfo.__init__(self, subpath, name, [], parent)
 
         # The names of the library components which are required when linking

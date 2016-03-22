@@ -591,7 +591,9 @@ def _runShTest(test, litConfig, useExternalSh, script, tmpBase):
 
 
 def executeShTest(test, litConfig, useExternalSh,
-                  extra_substitutions=[]):
+                  extra_substitutions=None):
+    if extra_substitutions is None:
+        extra_substitutions = []
     if test.config.unsupported:
         return (Test.UNSUPPORTED, 'Test is unsupported')
 
