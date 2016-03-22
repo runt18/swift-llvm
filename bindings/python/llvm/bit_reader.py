@@ -19,7 +19,7 @@ def parse_bitcode(mem_buffer):
     out = c_char_p(None)
     result = lib.LLVMParseBitcode(mem_buffer, byref(module), byref(out))
     if result:
-        raise RuntimeError('LLVM Error: %s' % out.value)
+        raise RuntimeError('LLVM Error: {0!s}'.format(out.value))
     m = Module(module)
     m.take_ownership(mem_buffer)
     return m

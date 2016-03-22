@@ -44,7 +44,7 @@ def VerifyIncludes(filename, lines):
       if prev_config_header:
         if prev_config_header > curr_config_header:
           lint.append((filename, line_num,
-                       'Config headers not in order: "%s" before "%s"' % (
+                       'Config headers not in order: "{0!s}" before "{1!s}"'.format(
                          prev_config_header, curr_config_header)))
 
     # Process system headers
@@ -55,12 +55,12 @@ def VerifyIncludes(filename, lines):
       # Is it blacklisted?
       if curr_system_header in DISALLOWED_SYSTEM_HEADERS:
         lint.append((filename, line_num,
-                     'Disallowed system header: <%s>' % curr_system_header))
+                     'Disallowed system header: <{0!s}>'.format(curr_system_header)))
       elif prev_system_header:
         # Make sure system headers are alphabetized amongst themselves
         if prev_system_header > curr_system_header:
           lint.append((filename, line_num,
-                       'System headers not in order: <%s> before <%s>' % (
+                       'System headers not in order: <{0!s}> before <{1!s}>'.format(
                          prev_system_header, curr_system_header)))
 
       prev_system_header = curr_system_header
@@ -86,7 +86,7 @@ class CppLint(common_lint.BaseLint):
 def CppLintMain(filenames):
   all_lint = common_lint.RunLintOverAllFiles(CppLint(), filenames)
   for lint in all_lint:
-    print '%s:%d:%s' % (lint[0], lint[1], lint[2])
+    print '{0!s}:{1:d}:{2!s}'.format(lint[0], lint[1], lint[2])
   return 0
 
 

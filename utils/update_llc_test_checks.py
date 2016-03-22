@@ -76,14 +76,14 @@ def main():
 
   for test in args.tests:
     if args.verbose:
-      print >>sys.stderr, 'Scanning for RUN lines in test file: %s' % (test,)
+      print >>sys.stderr, 'Scanning for RUN lines in test file: {0!s}'.format(test)
     with open(test) as f:
       test_lines = [l.rstrip() for l in f]
 
     run_lines = [m.group(1)
                  for m in [run_line_re.match(l) for l in test_lines] if m]
     if args.verbose:
-      print >>sys.stderr, 'Found %d RUN lines:' % (len(run_lines),)
+      print >>sys.stderr, 'Found {0:d} RUN lines:'.format(len(run_lines))
       for l in run_lines:
         print >>sys.stderr, '  RUN: ' + l
 
@@ -147,7 +147,7 @@ def main():
     is_in_function_start = False
     prefix_set = set([prefix for prefixes, _ in checks for prefix in prefixes])
     if args.verbose:
-      print >>sys.stderr, 'Rewriting FileCheck prefixes: %s' % (prefix_set,)
+      print >>sys.stderr, 'Rewriting FileCheck prefixes: {0!s}'.format(prefix_set)
     fixed_lines = []
     for l in test_lines:
       if is_in_function_start:
@@ -168,11 +168,11 @@ def main():
             if len(printed_prefixes) != 0:
               fixed_lines.append(';')
             printed_prefixes.append(prefix)
-            fixed_lines.append('; %s-LABEL: %s:' % (prefix, name))
+            fixed_lines.append('; {0!s}-LABEL: {1!s}:'.format(prefix, name))
             asm_lines = asm[prefix][name].splitlines()
-            fixed_lines.append('; %s:       %s' % (prefix, asm_lines[0]))
+            fixed_lines.append('; {0!s}:       {1!s}'.format(prefix, asm_lines[0]))
             for asm_line in asm_lines[1:]:
-              fixed_lines.append('; %s-NEXT:  %s' % (prefix, asm_line))
+              fixed_lines.append('; {0!s}-NEXT:  {1!s}'.format(prefix, asm_line))
             break
         is_in_function_start = False
 
@@ -203,7 +203,7 @@ def main():
       is_in_function = is_in_function_start = True
 
     if args.verbose:
-      print>>sys.stderr, 'Writing %d fixed lines to %s...' % (
+      print>>sys.stderr, 'Writing {0:d} fixed lines to {1!s}...'.format(
           len(fixed_lines), test)
     with open(test, 'w') as f:
       f.writelines([l + '\n' for l in fixed_lines])

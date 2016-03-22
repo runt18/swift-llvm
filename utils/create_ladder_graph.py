@@ -23,18 +23,18 @@ def main():
   rung1 = xrange(0, args.rungs, 2)
   rung2 = xrange(1, args.rungs, 2)
   for i in rung1:
-    print "rung1%d:" % i
+    print "rung1{0:d}:".format(i)
     print "*foo = x++;"
     if i != rung1[-1]:
-      print "if (*bar) goto rung1%d;" % (i+2)
-      print "else goto rung2%d;" % (i+1)
+      print "if (*bar) goto rung1{0:d};".format((i+2))
+      print "else goto rung2{0:d};".format((i+1))
     else:
-      print "goto rung2%d;" % (i+1)
+      print "goto rung2{0:d};".format((i+1))
   for i in rung2:
-    print "rung2%d:" % i
+    print "rung2{0:d}:".format(i)
     print "*foo = x++;"
     if i != rung2[-1]:
-      print "goto rung2%d;" % (i+2)
+      print "goto rung2{0:d};".format((i+2))
     else:
       print "return *foo;"
   print "}"

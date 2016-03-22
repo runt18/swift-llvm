@@ -76,7 +76,7 @@ class ShLexer:
                 self.eat()
                 if self.pos == self.end:
                     lit.util.warning(
-                        "escape at end of quoted argument in: %r" % self.data)
+                        "escape at end of quoted argument in: {0!r}".format(self.data))
                     return str
                 str += self.eat()
             else:
@@ -94,7 +94,7 @@ class ShLexer:
                 # character and backslash, otherwise it is preserved.
                 if self.pos == self.end:
                     lit.util.warning(
-                        "escape at end of quoted argument in: %r" % self.data)
+                        "escape at end of quoted argument in: {0!r}".format(self.data))
                     return str
                 c = self.eat()
                 if c == '"': # 
@@ -105,7 +105,7 @@ class ShLexer:
                     str += '\\' + c
             else:
                 str += c
-        lit.util.warning("missing quote character in %r" % self.data)
+        lit.util.warning("missing quote character in {0!r}".format(self.data))
         return str
     
     def lex_arg_checked(self, c):
@@ -117,10 +117,10 @@ class ShLexer:
         reference = self.lex_arg_slow(c)
         if res is not None:
             if res != reference:
-                raise ValueError("Fast path failure: %r != %r" % (
+                raise ValueError("Fast path failure: {0!r} != {1!r}".format(
                         res, reference))
             if self.pos != end:
-                raise ValueError("Fast path failure: %r != %r" % (
+                raise ValueError("Fast path failure: {0!r} != {1!r}".format(
                         self.pos, end))
         return reference
         
@@ -190,7 +190,7 @@ class ShParser:
         if not tok:
             raise ValueError("empty command!")
         if isinstance(tok, tuple):
-            raise ValueError("syntax error near unexpected token %r" % tok[0])
+            raise ValueError("syntax error near unexpected token {0!r}".format(tok[0]))
         
         args = [tok]
         redirects = []
@@ -215,7 +215,7 @@ class ShParser:
             op = self.lex()
             arg = self.lex()
             if not arg:
-                raise ValueError("syntax error near token %r" % op[0])
+                raise ValueError("syntax error near token {0!r}".format(op[0]))
             redirects.append((op, arg))
 
         return Command(args, redirects)
@@ -238,7 +238,7 @@ class ShParser:
 
             if not self.look():
                 raise ValueError(
-                    "missing argument to operator %r" % operator[0])
+                    "missing argument to operator {0!r}".format(operator[0]))
             
             # FIXME: Operator precedence!!
             lhs = Seq(lhs, operator[0], self.parse_pipeline())

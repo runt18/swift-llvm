@@ -19,8 +19,8 @@ num_sections = 65277
 # CHECK-NEXT: }
 
 for i in range(0, num_sections):
-	print("""	.section	.bss,"bw",discard,_b%d
-	.globl	_b%d                     # @b%d
-_b%d:
+	print("""	.section	.bss,"bw",discard,_b{0:d}
+	.globl	_b{1:d}                     # @b{2:d}
+_b{3:d}:
 	.byte	0                       # 0x0
-""" % (i, i, i, i))
+""".format(i, i, i, i))

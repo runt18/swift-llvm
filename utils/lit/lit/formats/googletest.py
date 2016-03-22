@@ -35,7 +35,7 @@ class GoogleTest(TestFormat):
               lines = lines.replace('\r', '')
             lines = lines.split('\n')
         except:
-            litConfig.error("unable to discover google-tests in %r" % path)
+            litConfig.error("unable to discover google-tests in {0!r}".format(path))
             raise StopIteration
 
         nested_tests = []
@@ -117,8 +117,7 @@ class GoogleTest(TestFormat):
 
         passing_test_line = '[  PASSED  ] 1 test.'
         if passing_test_line not in out:
-            msg = ('Unable to find %r in gtest output:\n\n%s%s' %
-                   (passing_test_line, out, err))
+            msg = ('Unable to find {0!r} in gtest output:\n\n{1!s}{2!s}'.format(passing_test_line, out, err))
             return lit.Test.UNRESOLVED, msg
 
         return lit.Test.PASS,''

@@ -38,9 +38,9 @@ class LitConfig:
 
         # Configuration files to look for when discovering test suites.
         self.config_prefix = config_prefix or 'lit'
-        self.config_name = '%s.cfg' % (self.config_prefix,)
-        self.site_config_name = '%s.site.cfg' % (self.config_prefix,)
-        self.local_config_name = '%s.local.cfg' % (self.config_prefix,)
+        self.config_name = '{0!s}.cfg'.format(self.config_prefix)
+        self.site_config_name = '{0!s}.site.cfg'.format(self.config_prefix)
+        self.local_config_name = '{0!s}.local.cfg'.format(self.config_prefix)
 
         self.numErrors = 0
         self.numWarnings = 0
@@ -62,7 +62,7 @@ class LitConfig:
         """load_config(config, path) - Load a config object from an alternate
         path."""
         if self.debug:
-            self.note('load_config from %r' % path)
+            self.note('load_config from {0!r}'.format(path))
         config.load_from_path(path, self)
         return config
 
@@ -100,9 +100,9 @@ class LitConfig:
         # Step out of _write_message, and then out of wrapper.
         f = f.f_back.f_back
         file,line,_,_,_ = inspect.getframeinfo(f)
-        location = '%s:%d' % (os.path.basename(file), line)
+        location = '{0!s}:{1:d}'.format(os.path.basename(file), line)
 
-        sys.stderr.write('%s: %s: %s: %s\n' % (self.progname, location,
+        sys.stderr.write('{0!s}: {1!s}: {2!s}: {3!s}\n'.format(self.progname, location,
                                                kind, message))
 
     def note(self, message):

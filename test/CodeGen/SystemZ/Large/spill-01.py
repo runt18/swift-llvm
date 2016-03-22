@@ -25,15 +25,15 @@ print ''
 print 'define void @f1(i64 *%base0, i64 *%base1) {'
 
 for i in range(count):
-    print '  %%ptr%d = getelementptr i64, i64 *%%base%d, i64 %d' % (i, i % 2, i / 2)
-    print '  %%val%d = load i64 , i64 *%%ptr%d' % (i, i)
+    print '  %ptr{0:d} = getelementptr i64, i64 *%base{1:d}, i64 {2:d}'.format(i, i % 2, i / 2)
+    print '  %val{0:d} = load i64 , i64 *%ptr{1:d}'.format(i, i)
     print ''
 
 print '  call void @foo()'
 print ''
 
 for i in range(count):
-    print '  store i64 %%val%d, i64 *%%ptr%d' % (i, i)
+    print '  store i64 %val{0:d}, i64 *%ptr{1:d}'.format(i, i)
 
 print ''
 print '  ret void'

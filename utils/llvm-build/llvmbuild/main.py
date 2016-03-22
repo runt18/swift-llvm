@@ -70,7 +70,7 @@ class LLVMProjectInfo(object):
             llvmbuild_path = os.path.join(llvmbuild_source_root + subpath,
                                           'LLVMBuild.txt')
             if not os.path.exists(llvmbuild_path):
-                fatal("missing LLVMBuild.txt file at: %r" % (llvmbuild_path,))
+                fatal("missing LLVMBuild.txt file at: {0!r}".format(llvmbuild_path))
 
             # Parse the components from it.
             common,info_iter = componentinfo.load_from_path(llvmbuild_path,
@@ -118,7 +118,7 @@ class LLVMProjectInfo(object):
             existing = self.component_info_map.get(ci.name)
             if existing is not None:
                 # We found a duplicate component name, report it and error out.
-                fatal("found duplicate component %r (at %r and %r)" % (
+                fatal("found duplicate component {0!r} (at {1!r} and {2!r})".format(
                         ci.name, ci.subpath, existing.subpath))
             self.component_info_map[ci.name] = ci
 
@@ -140,9 +140,9 @@ class LLVMProjectInfo(object):
             if ci in current_set:
                 # We found a cycle, report it and error out.
                 cycle_description = ' -> '.join(
-                    '%r (%s)' % (ci.name, relation)
+                    '{0!r} ({1!s})'.format(ci.name, relation)
                     for relation,ci in current_stack)
-                fatal("found cycle to %r after following: %s -> %s" % (
+                fatal("found cycle to {0!r} after following: {1!s} -> {2!s}".format(
                         ci.name, cycle_description, ci.name))
 
             # If we have already visited this item, we are done.
@@ -156,7 +156,7 @@ class LLVMProjectInfo(object):
             if ci.parent is not None:
                 parent = self.component_info_map.get(ci.parent)
                 if parent is None:
-                    fatal("component %r has invalid reference %r (via %r)" % (
+                    fatal("component {0!r} has invalid reference {1!r} (via {2!r})".format(
                             ci.name, ci.parent, 'parent'))
                 ci.set_parent_instance(parent)
 
@@ -164,7 +164,7 @@ class LLVMProjectInfo(object):
                 # Validate that the reference is ok.
                 referent = self.component_info_map.get(referent_name)
                 if referent is None:
-                    fatal("component %r has invalid reference %r (via %r)" % (
+                    fatal("component {0!r} has invalid reference {1!r} (via {2!r})".format(
                             ci.name, referent_name, relation))
 
                 # Visit the reference.
@@ -195,7 +195,7 @@ class LLVMProjectInfo(object):
 
     def print_tree(self):
         def visit(node, depth = 0):
-            print('%s%-40s (%s)' % ('  '*depth, node.name, node.type_name))
+            print('{0!s}{1:<40!s} ({2!s})'.format('  '*depth, node.name, node.type_name))
             for c in node.children:
                 visit(c, depth + 1)
         visit(self.component_info_map['$ROOT'])
@@ -236,8 +236,8 @@ class LLVMProjectInfo(object):
             subdirectories = subpath_subdirs.get(subpath)
             if subdirectories:
                 fragment = """\
-subdirectories = %s
-""" % (" ".join(sorted(subdirectories)),)
+subdirectories = {0!s}
+""".format(" ".join(sorted(subdirectories)))
                 fragments.append(("common", fragment))
 
             # Add the component fragments.
@@ -247,7 +247,7 @@ subdirectories = %s
                 if fragment is None:
                     continue
 
-                name = "component_%d" % (len(fragments) - num_common_fragments)
+                name = "component_{0:d}".format((len(fragments) - num_common_fragments))
                 fragments.append((name, fragment))
 
             if not fragments:
@@ -285,7 +285,7 @@ subdirectories = %s
             header_pad = '-' * (80 - len(header_fmt % (header_name, '')))
             header_string = header_fmt % (header_name, header_pad)
             f.write("""\
-%s
+{0!s}
 ;
 ;                     The LLVM Compiler Infrastructure
 ;
@@ -302,14 +302,14 @@ subdirectories = %s
 ;
 ;===------------------------------------------------------------------------===;
 
-""" % header_string)
+""".format(header_string))
 
             # Write out each fragment.each component fragment.
             for name,fragment in fragments:
                 comment = comments_map.get(name)
                 if comment is not None:
                     f.write(comment)
-                f.write("[%s]\n" % name)
+                f.write("[{0!s}]\n".format(name))
                 f.write(fragment)
                 if fragment is not fragments[-1][1]:
                     f.write('\n')
@@ -406,21 +406,21 @@ subdirectories = %s
         f.write('\n')
         f.write('\
   /// The list of libraries required when linking this component.\n')
-        f.write('  const char *RequiredLibraries[%d];\n' % (
-            max_required_libraries))
-        f.write('} AvailableComponents[%d] = {\n' % len(entries))
+        f.write('  const char *RequiredLibraries[{0:d}];\n'.format((
+            max_required_libraries)))
+        f.write('}} AvailableComponents[{0:d}] = {{\n'.format(len(entries)))
         for name,library_name,required_names,is_installed in entries:
             if library_name is None:
                 library_name_as_cstr = 'nullptr'
             else:
-                library_name_as_cstr = '"lib%s.a"' % library_name
+                library_name_as_cstr = '"lib{0!s}.a"'.format(library_name)
             if is_installed:
                 is_installed_as_cstr = 'true'
             else:
                 is_installed_as_cstr = 'false'
-            f.write('  { "%s", %s, %s, { %s } },\n' % (
+            f.write('  {{ "{0!s}", {1!s}, {2!s}, {{ {3!s} }} }},\n'.format(
                 name, library_name_as_cstr, is_installed_as_cstr,
-                ', '.join('"%s"' % dep
+                ', '.join('"{0!s}"'.format(dep)
                           for dep in required_names)))
         f.write('};\n')
         f.close()
@@ -555,7 +555,7 @@ subdirectories = %s
         header_pad = '-' * (80 - len(header_fmt % (header_name, '')))
         header_string = header_fmt % (header_name, header_pad)
         f.write("""\
-%s
+{0!s}
 #
 #                     The LLVM Compiler Infrastructure
 #
@@ -571,7 +571,7 @@ subdirectories = %s
 #
 #===------------------------------------------------------------------------===#
 
-""" % header_string)
+""".format(header_string))
 
         # Write the dependency information in the best way we can.
         f.write("""
@@ -588,9 +588,9 @@ subdirectories = %s
 """)
         for dep in dependencies:
             f.write("""\
-configure_file(\"%s\"
-               ${CMAKE_CURRENT_BINARY_DIR}/DummyConfigureOutput)\n""" % (
-                cmake_quote_path(dep),))
+configure_file(\"{0!s}\"
+               ${{CMAKE_CURRENT_BINARY_DIR}}/DummyConfigureOutput)\n""".format(
+                cmake_quote_path(dep)))
 
         # Write the properties we use to encode the required library dependency
         # information in a form CMake can easily use directly.
@@ -603,7 +603,7 @@ configure_file(\"%s\"
         self.foreach_cmake_library(
             lambda ci:
               f.write("""\
-set_property(GLOBAL PROPERTY LLVMBUILD_LIB_DEPS_%s %s)\n""" % (
+set_property(GLOBAL PROPERTY LLVMBUILD_LIB_DEPS_{0!s} {1!s})\n""".format(
                 ci.get_prefixed_library_name(), " ".join(sorted(
                      dep.get_prefixed_library_name()
                      for dep in self.get_required_libraries_for_component(ci)))))
@@ -639,7 +639,7 @@ set_property(GLOBAL PROPERTY LLVMBUILD_LIB_DEPS_%s %s)\n""" % (
         self.foreach_cmake_library(
             lambda ci:
               f.write("""\
-set_property(TARGET %s PROPERTY IMPORTED_LINK_INTERFACE_LIBRARIES %s)\n""" % (
+set_property(TARGET {0!s} PROPERTY IMPORTED_LINK_INTERFACE_LIBRARIES {1!s})\n""".format(
                 ci.get_prefixed_library_name(), " ".join(sorted(
                      dep.get_prefixed_library_name()
                      for dep in self.get_required_libraries_for_component(ci)))))
@@ -674,7 +674,7 @@ set_property(TARGET %s PROPERTY IMPORTED_LINK_INTERFACE_LIBRARIES %s)\n""" % (
         header_pad = '-' * (80 - len(header_fmt % (header_name, '')))
         header_string = header_fmt % (header_name, header_pad)
         f.write("""\
-%s
+{0!s}
 #
 #                     The LLVM Compiler Infrastructure
 #
@@ -690,7 +690,7 @@ set_property(TARGET %s PROPERTY IMPORTED_LINK_INTERFACE_LIBRARIES %s)\n""" % (
 #
 #===------------------------------------------------------------------------===#
 
-""" % header_string)
+""".format(header_string))
 
         # Write the dependencies for the fragment.
         #
@@ -702,9 +702,9 @@ set_property(TARGET %s PROPERTY IMPORTED_LINK_INTERFACE_LIBRARIES %s)\n""" % (
 """)
         f.write('ifeq ($(LLVMBUILD_INCLUDE_DEPENDENCIES),1)\n')
         f.write("# The dependencies for this Makefile fragment itself.\n")
-        f.write("%s: \\\n" % (mk_quote_string_for_target(output_path),))
+        f.write("{0!s}: \\\n".format(mk_quote_string_for_target(output_path)))
         for dep in dependencies:
-            f.write("\t%s \\\n" % (dep,))
+            f.write("\t{0!s} \\\n".format(dep))
         f.write('\n')
 
         # Generate dummy rules for each of the dependencies, so that things
@@ -714,7 +714,7 @@ set_property(TARGET %s PROPERTY IMPORTED_LINK_INTERFACE_LIBRARIES %s)\n""" % (
 # removed.
 """)
         for dep in dependencies:
-            f.write("%s:\n" % (mk_quote_string_for_target(dep),))
+            f.write("{0!s}:\n".format(mk_quote_string_for_target(dep)))
         f.write('endif\n')
 
         f.write("""
@@ -723,7 +723,7 @@ set_property(TARGET %s PROPERTY IMPORTED_LINK_INTERFACE_LIBRARIES %s)\n""" % (
 LLVM_LIBS_TO_EXPORT :=""")
         self.foreach_cmake_library(
             lambda ci:
-                f.write(' \\\n  %s' % ci.get_prefixed_library_name())
+                f.write(' \\\n  {0!s}'.format(ci.get_prefixed_library_name()))
             ,
             enabled_optional_components,
             skip_disabled = True,
@@ -760,11 +760,11 @@ def add_magic_target_components(parser, project, opts):
     else:
         native_target = available_targets.get(native_target_name)
         if native_target is None:
-            parser.error("invalid native target: %r (not in project)" % (
-                    opts.native_target,))
+            parser.error("invalid native target: {0!r} (not in project)".format(
+                    opts.native_target))
         if native_target.type_name != 'TargetGroup':
-            parser.error("invalid native target: %r (not a target)" % (
-                    opts.native_target,))
+            parser.error("invalid native target: {0!r} (not a target)".format(
+                    opts.native_target))
 
     # Find the list of targets to enable.
     if opts.enable_targets is None:
@@ -782,11 +782,11 @@ def add_magic_target_components(parser, project, opts):
         for name in enable_target_names:
             target = available_targets.get(name)
             if target is None:
-                parser.error("invalid target to enable: %r (not in project)" % (
-                        name,))
+                parser.error("invalid target to enable: {0!r} (not in project)".format(
+                        name))
             if target.type_name != 'TargetGroup':
-                parser.error("invalid target to enable: %r (not a target)" % (
-                        name,))
+                parser.error("invalid target to enable: {0!r} (not a target)".format(
+                        name))
             enable_targets.append(target)
 
     # Find the special library groups we are going to populate. We enforce that
@@ -796,18 +796,18 @@ def add_magic_target_components(parser, project, opts):
     def find_special_group(name):
         info = info_map.get(name)
         if info is None:
-            fatal("expected project to contain special %r component" % (
-                    name,))
+            fatal("expected project to contain special {0!r} component".format(
+                    name))
 
         if info.type_name != 'LibraryGroup':
-            fatal("special component %r should be a LibraryGroup" % (
-                    name,))
+            fatal("special component {0!r} should be a LibraryGroup".format(
+                    name))
 
         if info.required_libraries:
-            fatal("special component %r must have empty %r list" % (
+            fatal("special component {0!r} must have empty {1!r} list".format(
                     name, 'required_libraries'))
         if info.add_to_library_groups:
-            fatal("special component %r must have empty %r list" % (
+            fatal("special component {0!r} must have empty {1!r} list".format(
                     name, 'add_to_library_groups'))
 
         info._is_special_group = True
@@ -830,7 +830,7 @@ def add_magic_target_components(parser, project, opts):
     if native_target and native_target.enabled:
         native_group.required_libraries.append(native_target.name)
         native_codegen_group.required_libraries.append(
-            '%sCodeGen' % native_target.name)
+            '{0!s}CodeGen'.format(native_target.name))
 
     # If we have a native target with a JIT, use that for the engine. Otherwise,
     # use the interpreter.
@@ -916,7 +916,7 @@ given by --build-root) at the same SUBPATH""",
     if source_root:
         if not os.path.exists(os.path.join(source_root, 'lib', 'IR',
                                            'Function.cpp')):
-            parser.error('invalid LLVM source root: %r' % source_root)
+            parser.error('invalid LLVM source root: {0!r}'.format(source_root))
     else:
         llvmbuild_path = os.path.dirname(__file__)
         llvm_build_path = os.path.dirname(llvmbuild_path)
@@ -976,18 +976,18 @@ given by --build-root) at the same SUBPATH""",
                              if ci.type_name == 'TargetGroup']
         substitutions = [
             ("@LLVM_ENUM_TARGETS@",
-             ' '.join('LLVM_TARGET(%s)' % ci.name
+             ' '.join('LLVM_TARGET({0!s})'.format(ci.name)
                       for ci in available_targets)),
             ("@LLVM_ENUM_ASM_PRINTERS@",
-             ' '.join('LLVM_ASM_PRINTER(%s)' % ci.name
+             ' '.join('LLVM_ASM_PRINTER({0!s})'.format(ci.name)
                       for ci in available_targets
                       if ci.has_asmprinter)),
             ("@LLVM_ENUM_ASM_PARSERS@",
-             ' '.join('LLVM_ASM_PARSER(%s)' % ci.name
+             ' '.join('LLVM_ASM_PARSER({0!s})'.format(ci.name)
                       for ci in available_targets
                       if ci.has_asmparser)),
             ("@LLVM_ENUM_DISASSEMBLERS@",
-             ' '.join('LLVM_DISASSEMBLER(%s)' % ci.name
+             ' '.join('LLVM_DISASSEMBLER({0!s})'.format(ci.name)
                       for ci in available_targets
                       if ci.has_disassembler))]
 
@@ -997,7 +997,7 @@ given by --build-root) at the same SUBPATH""",
             outpath = os.path.join(opts.build_root, subpath)
             result = configutil.configure_file(inpath, outpath, substitutions)
             if not result:
-                note("configured file %r hasn't changed" % outpath)
+                note("configured file {0!r} hasn't changed".format(outpath))
 
 if __name__=='__main__':
     main()

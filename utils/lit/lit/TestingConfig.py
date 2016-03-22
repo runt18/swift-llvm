@@ -86,7 +86,7 @@ class TestingConfig:
             try:
                 data = f.read()
             except:
-                litConfig.fatal('unable to load config file: %r' % (path,))
+                litConfig.fatal('unable to load config file: {0!r}'.format(path))
             f.close()
 
         # Execute the config script to initialize the object.
@@ -100,7 +100,7 @@ class TestingConfig:
             else:
                 exec(compile(data, path, 'exec'), cfg_globals, None)
             if litConfig.debug:
-                litConfig.note('... loaded config %r' % path)
+                litConfig.note('... loaded config {0!r}'.format(path))
         except SystemExit:
             e = sys.exc_info()[1]
             # We allow normal system exit inside a config file to just
@@ -110,7 +110,7 @@ class TestingConfig:
         except:
             import traceback
             litConfig.fatal(
-                'unable to parse config file %r, traceback: %s' % (
+                'unable to parse config file {0!r}, traceback: {1!s}'.format(
                     path, traceback.format_exc()))
 
         self.finish(litConfig)

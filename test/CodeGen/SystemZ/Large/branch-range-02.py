@@ -67,16 +67,16 @@ a, b = 1, 1
 for i in xrange(blocks):
     a, b = b, a + b
     value = a % 256
-    next = 'b%d' % (i + 1) if i + 1 < blocks else 'end'
+    next = 'b{0:d}'.format((i + 1)) if i + 1 < blocks else 'end'
     other = 'end' if 2 * i < blocks else 'b0'
-    print 'b%d:' % i
-    print '  store volatile i8 %d, i8 *%%base' % value
-    print '  %%astop%d = getelementptr i32, i32 *%%stop, i64 %d' % (i, i)
-    print '  %%acur%d = load i32 , i32 *%%astop%d' % (i, i)
-    print '  %%atest%d = icmp eq i32 %%limit, %%acur%d' % (i, i)
-    print '  br i1 %%atest%d, label %%%s, label %%%s' % (i, other, next)
+    print 'b{0:d}:'.format(i)
+    print '  store volatile i8 {0:d}, i8 *%base'.format(value)
+    print '  %astop{0:d} = getelementptr i32, i32 *%stop, i64 {1:d}'.format(i, i)
+    print '  %acur{0:d} = load i32 , i32 *%astop{1:d}'.format(i, i)
+    print '  %atest{0:d} = icmp eq i32 %limit, %acur{1:d}'.format(i, i)
+    print '  br i1 %atest{0:d}, label %{1!s}, label %{2!s}'.format(i, other, next)
 
 print ''
-print '%s:' % next
+print '{0!s}:'.format(next)
 print '  ret void'
 print '}'

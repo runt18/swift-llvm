@@ -41,7 +41,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'LLVM'
-copyright = u'2003-%d, LLVM Project' % date.today().year
+copyright = u'2003-{0:d}, LLVM Project'.format(date.today().year)
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -233,8 +233,8 @@ for name in os.listdir(command_guide_path):
 
         if len(header) != len(title):
             print >>sys.stderr, (
-                "error: invalid header in %r (does not match title)" % (
-                    file_subpath,))
+                "error: invalid header in {0!r} (does not match title)".format(
+                    file_subpath))
         if ' - ' not in title:
             print >>sys.stderr, (
                 ("error: invalid title in %r "

@@ -42,7 +42,7 @@ def getTestSuite(item, litConfig, cache):
 
         # We found a test suite, create a new config for it and load it.
         if litConfig.debug:
-            litConfig.note('loading suite config %r' % cfgpath)
+            litConfig.note('loading suite config {0!r}'.format(cfgpath))
 
         cfg = TestingConfig.fromdefaults(litConfig)
         cfg.load_from_path(cfgpath, litConfig)
@@ -93,7 +93,7 @@ def getLocalConfig(ts, path_in_suite, litConfig, cache):
         # file into it.
         config = copy.deepcopy(parent)
         if litConfig.debug:
-            litConfig.note('loading local config %r' % cfgpath)
+            litConfig.note('loading local config {0!r}'.format(cfgpath))
         config.load_from_path(cfgpath, litConfig)
         return config
 
@@ -110,11 +110,11 @@ def getTests(path, litConfig, testSuiteCache, localConfigCache):
     # Find the test suite for this input and its relative path.
     ts,path_in_suite = getTestSuite(path, litConfig, testSuiteCache)
     if ts is None:
-        litConfig.warning('unable to find test suite for %r' % path)
+        litConfig.warning('unable to find test suite for {0!r}'.format(path))
         return (),()
 
     if litConfig.debug:
-        litConfig.note('resolved input %r to %r::%r' % (path, ts.name,
+        litConfig.note('resolved input {0!r} to {1!r}::{2!r}'.format(path, ts.name,
                                                         path_in_suite))
 
     return ts, getTestsInSuite(ts, path_in_suite, litConfig,
@@ -187,7 +187,7 @@ def getTestsInSuite(ts, path_in_suite, litConfig,
             N += 1
             yield res
         if sub_ts and not N:
-            litConfig.warning('test suite %r contained no tests' % sub_ts.name)
+            litConfig.warning('test suite {0!r} contained no tests'.format(sub_ts.name))
 
 def find_tests_for_inputs(lit_config, inputs):
     """
@@ -221,11 +221,11 @@ def find_tests_for_inputs(lit_config, inputs):
         tests.extend(getTests(input, lit_config,
                               test_suite_cache, local_config_cache)[1])
         if prev == len(tests):
-            lit_config.warning('input %r contained no tests' % input)
+            lit_config.warning('input {0!r} contained no tests'.format(input))
 
     # If there were any errors during test discovery, exit now.
     if lit_config.numErrors:
-        sys.stderr.write('%d errors, exiting.\n' % lit_config.numErrors)
+        sys.stderr.write('{0:d} errors, exiting.\n'.format(lit_config.numErrors))
         sys.exit(2)
 
     return tests

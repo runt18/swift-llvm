@@ -23,7 +23,7 @@ def VerifyLineLength(filename, lines, max_length):
     length = len(line.rstrip('\n'))
     if length > max_length:
       lint.append((filename, line_num,
-                   'Line exceeds %d chars (%d)' % (max_length, length)))
+                   'Line exceeds {0:d} chars ({1:d})'.format(max_length, length)))
     line_num += 1
   return lint
 
@@ -89,7 +89,7 @@ def RunLintOverAllFiles(linter, filenames):
   for filename in filenames:
     file = open(filename, 'r')
     if not file:
-      print 'Cound not open %s' % filename
+      print 'Cound not open {0!s}'.format(filename)
       continue
     lines = file.readlines()
     lint.extend(linter.RunOnFile(filename, lines))

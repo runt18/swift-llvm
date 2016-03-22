@@ -5,31 +5,31 @@ class TimingScriptGenerator:
     def __init__(self, scriptname, outputname):
         self.shfile = open(scriptname, 'w')
         self.timeFile = outputname
-        self.shfile.write("echo \"\" > %s\n" % self.timeFile)
+        self.shfile.write("echo \"\" > {0!s}\n".format(self.timeFile))
 
     def writeTimingCall(self, irname, callname):
         """Echo some comments and invoke both versions of toy"""
         rootname = irname
         if '.' in irname:
             rootname = irname[:irname.rfind('.')]
-        self.shfile.write("echo \"%s: Calls %s\" >> %s\n" % (callname, irname, self.timeFile))
-        self.shfile.write("echo \"\" >> %s\n" % self.timeFile)
-        self.shfile.write("echo \"With MCJIT\" >> %s\n" % self.timeFile)
+        self.shfile.write("echo \"{0!s}: Calls {1!s}\" >> {2!s}\n".format(callname, irname, self.timeFile))
+        self.shfile.write("echo \"\" >> {0!s}\n".format(self.timeFile))
+        self.shfile.write("echo \"With MCJIT\" >> {0!s}\n".format(self.timeFile))
         self.shfile.write("/usr/bin/time -f \"Command %C\\n\\tuser time: %U s\\n\\tsytem time: %S s\\n\\tmax set: %M kb\"")
-        self.shfile.write(" -o %s -a " % self.timeFile)
-        self.shfile.write("./toy-mcjit -use-object-cache -input-IR=%s < %s > %s-mcjit.out 2> %s-mcjit.err\n" % (irname, callname, rootname, rootname))
-        self.shfile.write("echo \"\" >> %s\n" % self.timeFile)
-        self.shfile.write("echo \"With MCJIT again\" >> %s\n" % self.timeFile)
+        self.shfile.write(" -o {0!s} -a ".format(self.timeFile))
+        self.shfile.write("./toy-mcjit -use-object-cache -input-IR={0!s} < {1!s} > {2!s}-mcjit.out 2> {3!s}-mcjit.err\n".format(irname, callname, rootname, rootname))
+        self.shfile.write("echo \"\" >> {0!s}\n".format(self.timeFile))
+        self.shfile.write("echo \"With MCJIT again\" >> {0!s}\n".format(self.timeFile))
         self.shfile.write("/usr/bin/time -f \"Command %C\\n\\tuser time: %U s\\n\\tsytem time: %S s\\n\\tmax set: %M kb\"")
-        self.shfile.write(" -o %s -a " % self.timeFile)
-        self.shfile.write("./toy-mcjit -use-object-cache -input-IR=%s < %s > %s-mcjit.out 2> %s-mcjit.err\n" % (irname, callname, rootname, rootname))
-        self.shfile.write("echo \"\" >> %s\n" % self.timeFile)
-        self.shfile.write("echo \"With JIT\" >> %s\n" % self.timeFile)
+        self.shfile.write(" -o {0!s} -a ".format(self.timeFile))
+        self.shfile.write("./toy-mcjit -use-object-cache -input-IR={0!s} < {1!s} > {2!s}-mcjit.out 2> {3!s}-mcjit.err\n".format(irname, callname, rootname, rootname))
+        self.shfile.write("echo \"\" >> {0!s}\n".format(self.timeFile))
+        self.shfile.write("echo \"With JIT\" >> {0!s}\n".format(self.timeFile))
         self.shfile.write("/usr/bin/time -f \"Command %C\\n\\tuser time: %U s\\n\\tsytem time: %S s\\n\\tmax set: %M kb\"")
-        self.shfile.write(" -o %s -a " % self.timeFile)
-        self.shfile.write("./toy-jit -input-IR=%s < %s > %s-mcjit.out 2> %s-mcjit.err\n" % (irname, callname, rootname, rootname))
-        self.shfile.write("echo \"\" >> %s\n" % self.timeFile)
-        self.shfile.write("echo \"\" >> %s\n" % self.timeFile)
+        self.shfile.write(" -o {0!s} -a ".format(self.timeFile))
+        self.shfile.write("./toy-jit -input-IR={0!s} < {1!s} > {2!s}-mcjit.out 2> {3!s}-mcjit.err\n".format(irname, callname, rootname, rootname))
+        self.shfile.write("echo \"\" >> {0!s}\n".format(self.timeFile))
+        self.shfile.write("echo \"\" >> {0!s}\n".format(self.timeFile))
 
 class LibScriptGenerator:
     """Used to generate a bash script which will convert Kaleidoscope files to IR"""
@@ -37,7 +37,7 @@ class LibScriptGenerator:
         self.shfile = open(filename, 'w')
 
     def writeLibGenCall(self, libname, irname):
-        self.shfile.write("./toy-ir-gen < %s 2> %s\n" % (libname, irname))
+        self.shfile.write("./toy-ir-gen < {0!s} 2> {1!s}\n".format(libname, irname))
 
 def splitScript(inputname, libGenScript, timingScript):
   rootname = inputname[:-2]
@@ -47,7 +47,7 @@ def splitScript(inputname, libGenScript, timingScript):
   infile = open(inputname, "r")
   libfile = open(libname, "w")
   callfile = open(callname, "w")
-  print "Splitting %s into %s and %s" % (inputname, callname, libname)
+  print "Splitting {0!s} into {1!s} and {2!s}".format(inputname, callname, libname)
   for line in infile:
     if not line.startswith("#"):
       if line.startswith("print"):

@@ -80,30 +80,30 @@ print '  br label %before0'
 print ''
 
 for i in xrange(branch_blocks):
-    next = 'before%d' % (i + 1) if i + 1 < branch_blocks else 'main'
-    print 'before%d:' % i
-    print '  %%bcur%d = load i8 , i8 *%%stop' % i
-    print '  %%bext%d = sext i8 %%bcur%d to i64' % (i, i)
-    print '  %%btest%d = icmp slt i64 %%bext%d, %d' % (i, i, i + 50)
-    print '  br i1 %%btest%d, label %%after0, label %%%s' % (i, next)
+    next = 'before{0:d}'.format((i + 1)) if i + 1 < branch_blocks else 'main'
+    print 'before{0:d}:'.format(i)
+    print '  %bcur{0:d} = load i8 , i8 *%stop'.format(i)
+    print '  %bext{0:d} = sext i8 %bcur{1:d} to i64'.format(i, i)
+    print '  %btest{0:d} = icmp slt i64 %bext{1:d}, {2:d}'.format(i, i, i + 50)
+    print '  br i1 %btest{0:d}, label %after0, label %{1!s}'.format(i, next)
     print ''
 
-print '%s:' % next
+print '{0!s}:'.format(next)
 a, b = 1, 1
 for i in xrange(0, main_size, 6):
     a, b = b, a + b
     offset = 4096 + b % 500000
     value = a % 256
-    print '  %%ptr%d = getelementptr i8, i8 *%%base, i64 %d' % (i, offset)
-    print '  store volatile i8 %d, i8 *%%ptr%d' % (value, i)
+    print '  %ptr{0:d} = getelementptr i8, i8 *%base, i64 {1:d}'.format(i, offset)
+    print '  store volatile i8 {0:d}, i8 *%ptr{1:d}'.format(value, i)
 
 for i in xrange(branch_blocks):
-    print '  %%acur%d = load i8 , i8 *%%stop' % i
-    print '  %%aext%d = sext i8 %%acur%d to i64' % (i, i)
-    print '  %%atest%d = icmp slt i64 %%aext%d, %d' % (i, i, i + 100)
-    print '  br i1 %%atest%d, label %%main, label %%after%d' % (i, i)
+    print '  %acur{0:d} = load i8 , i8 *%stop'.format(i)
+    print '  %aext{0:d} = sext i8 %acur{1:d} to i64'.format(i, i)
+    print '  %atest{0:d} = icmp slt i64 %aext{1:d}, {2:d}'.format(i, i, i + 100)
+    print '  br i1 %atest{0:d}, label %main, label %after{1:d}'.format(i, i)
     print ''
-    print 'after%d:' % i
+    print 'after{0:d}:'.format(i)
 
 print '  ret void'
 print '}'
