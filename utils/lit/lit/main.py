@@ -130,8 +130,10 @@ def sort_by_incremental_cache(run):
             return 0
     run.tests.sort(key = lambda t: sortIndex(t))
 
-def main(builtinParameters = {}):
+def main(builtinParameters = None):
     # Use processes by default on Unix platforms.
+    if builtinParameters is None:
+        builtinParameters = {}
     isWindows = platform.system() == 'Windows'
     useProcessesIsDefault = not isWindows
 

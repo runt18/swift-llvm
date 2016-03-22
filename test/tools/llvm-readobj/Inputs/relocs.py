@@ -20,7 +20,9 @@ import subprocess
 import sys
 
 class EnumType(type):
-  def __init__(self, name, bases = (), attributes = {}):
+  def __init__(self, name, bases = (), attributes = None):
+    if attributes is None:
+      attributes = {}
     super(EnumType, self).__init__(name, bases, attributes)
 
     type.__setattr__(self, '_map', {})

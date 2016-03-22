@@ -118,7 +118,9 @@ class TestingConfig:
     def __init__(self, parent, name, suffixes, test_format,
                  environment, substitutions, unsupported,
                  test_exec_root, test_source_root, excludes,
-                 available_features, pipefail, limit_to_features = []):
+                 available_features, pipefail, limit_to_features = None):
+        if limit_to_features is None:
+            limit_to_features = []
         self.parent = parent
         self.name = str(name)
         self.suffixes = set(suffixes)
